@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class ProductoController {
     }
     //GET http://localhost:8080/api/v1/productos
     @GetMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<Producto>> findAll(@RequestParam(name = "nombre", required = false) String nombre,
                                                     @RequestParam(name = "precioInicial", required = false) Double precioInicial,
                                                     @RequestParam(name = "precioFinal", required = false) Double precioFinal){  
@@ -52,6 +54,7 @@ public class ProductoController {
     }
     //http://localhost:8080/api/v1/productos/25
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Producto> buscarPorId(@PathVariable("id") Long id){
         Producto producto = productoService.findByid(id).orElseThrow(() -> new ResourceNotFound("No se encontr[o producto"));
         return ResponseEntity.ok().body(producto);
@@ -71,6 +74,7 @@ public class ProductoController {
     }*/
     //POST http://localhost:8080/api/v1/productos
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> create(@Valid @RequestBody Producto producto){
         Producto productoCreado = productoService.create(producto);
         //http://localhost:8080/api/v1/productos/2203
@@ -82,6 +86,7 @@ public class ProductoController {
     }
     //PUT http://localhost:8080/api/v1/productos/{id}
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> update(@PathVariable("id") Long id, @RequestBody Producto updatedProducto){
         Optional<Producto> updated = productoService.update(id, updatedProducto);
         return updated.map(producto -> ResponseEntity.ok().body(producto))
@@ -96,6 +101,7 @@ public class ProductoController {
     }
     //DELETE http://localhost:8080/api/v1/productos/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> delete(@PathVariable("id") Long id){
         
         try {
